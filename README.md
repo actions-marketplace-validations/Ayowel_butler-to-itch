@@ -14,73 +14,49 @@ Your Butler key should be saved as a secret.
 This example pushes 5 files to Itch, each in a dedicated channel.
 
 ```yml
-# .github/workflows/release.yml
-name: Release project
-on:
-  workflow_dispatch:
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: Ayowel/butler-to-itch@v1
-        with:
-          butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
-          itch_user: Ayowel
-          itch_game: renpy-extensions-demo
-          version: ${{ github.ref_name }}
-          # We assume that we have the following files in ./build:
-          # release-linux.tar.gz, release-windows.zip,
-          # release-mac.zip, java-release.apk
-          files: |
-                   build/release-*
-            doc    docs/html
-            mobile build/java-*
+# We have the following files in ./build:
+# release-linux.tar.gz, release-windows.zip,
+# release-mac.zip, java-release.apk
+- uses: Ayowel/butler-to-itch@v1
+  with:
+    butler_key: ${{ secrets.BUTLER_CREDENTIALS }}
+    itch_user: Ayowel
+    itch_game: renpy-extensions-demo
+    version: ${{ github.ref_name }}
+    files: |
+              build/release-*
+      doc    docs/html
+      mobile build/java-*
 ```
 
 ## Inputs
 
-The step configuration looks like this:
+Generic parameters:
 
-```yml
-- uses: Ayowel/butler-to-itch@v1
-  with:
-    # Whether to install Butler or to push a file.
-    # This may be used when you want to use Butler with custom
-    # commands.
-    action: "push"
-    # Where Butler should be installed.
-    install_dir: ~/.butler
-    # Where Butler should be downloaded from.
-    butler_source: "https://broth.itch.ovh/butler"
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| **action** | Whether to `install` Butler or to `push` a file. | `'push'` |
+| **install_dir** | Install Butler to a custom location. | `~/.butler` |
+| **butler_source** | Where Butler should be download from. | `'https://broth.itch.ovh/butler'` |
 
-    ###### Push options ######
-    # Your butler key (see https://itch.io/user/settings/api-keys)
-    butler_key: ""
-    # The itch username of the user that distributes the game
-    itch_user: ""
-    # The name of the game in the project's url
-    itch_game: ""
-    # The game version number
-    version: ""
-    # The files to push to itch.
-    # File paths support globing and may start with a channel name.
-    files: ""
-    # If no channel is provided for a file, to generate one from the
-    # file's name.
-    auto_channel: true
+Push parameters:
 
-    ###### Install options ######
-    # Whether to verify the downloaded Butler archive's signature
-    check_signature: true
-    # Whether to update the PATH variable to include Butler's
-    # install directory
-    update_path: false
-    # Which Butler version to install
-    butler_version: "latest"
-```
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| **butler_key** | Your butler key (see https://itch.io/user/settings/api-keys). | `""` |
+| **itch_user** | The itch username of the user that distributes the game. | `""` |
+| **itch_game** | The name of the game in the project's url. | `""` |
+| **version** | The game's version number. | `""` |
+| **files** | The files to push to itch. File paths support globing and may start with a channel name. | `""` |
+| **auto_channel** | If no channel is provided for a file, generate one from the file's name (see "Behavior of auto_channel" below). | `true` |
+
+Install parameters:
+
+| Parameter | Description | Default |
+| --------- | ----------- | ------- |
+| **check_signature** | Whether to verify the downloaded Butler archive's signature. | `true` |
+| **update_path** | Whether to update the PATH variable to include Butler's install directory. | `false` |
+| **butler_version** | Which Butler version to install. | `'latest'` |
 
 ## Outputs
 
